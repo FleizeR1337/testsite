@@ -68,20 +68,27 @@ def create_classroom(request):
 
     return render(request, 'create_classroom.html', {'form': form})
 
-
 def test_view(request, test_id):
     test = get_object_or_404(Test, pk=test_id)
 
-    if 'questions_order' not in request.session:
+    # Check if the current test is different from the one in the session
+    if request.session.get('current_test_id') != test_id:
+        # Update the session with the new test ID and reset the questions order
+        request.session['current_test_id'] = test_id
         questions = list(Question.objects.filter(test=test))
         random.shuffle(questions)
         questions = questions[:30]
         request.session['questions_order'] = [q.id for q in questions]
+
+        # Clear any saved answers from the previous test
+        keys_to_clear = [key for key in request.session.keys() if key.startswith('answer_')]
+        for key in keys_to_clear:
+            del request.session[key]
     else:
         questions_ids = request.session['questions_order']
         questions = [Question.objects.get(id=qid) for qid in questions_ids]
 
-    # Загрузка сохраненных ответов
+    # Load saved answers
     saved_answers = {key.split('_')[1]: request.session[key] for key in request.session.keys() if key.startswith('answer_')}
 
     context = {'test': test, 'questions': questions, 'saved_answers': saved_answers}
