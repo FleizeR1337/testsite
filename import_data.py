@@ -27,4 +27,4 @@ def import_data(csv_filename):
                 )
 
 # Вызовите функцию с путем к файлу CSV
-import_data('C:/Users/mc02t/Desktop/test2.txt')  # Замените на актуальный путь к файлу
+import_data('C:/Users/mc02t/Desktop/test3.txt')  # Замените на актуальный путь к файлу
